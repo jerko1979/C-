@@ -1,0 +1,402 @@
+﻿<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+
+
+<div class="media-body" style="border:thin">   
+    <div class="infoDiv">
+        <label for="Sortiraj prema">Sortiraj prema:</label>
+        <select  id="myselect">
+            <option value="0">Odaberi</option>
+            <option value="1">Broj sesija</option>
+            <option value="2">Ime</option>
+        </select>        
+    </div>          
+        <div class="infoDiv">
+            <label for="Filtriraj objekt">Filtriraj objekt:</label>
+            <select  id="filter">
+                <option value="0">Odaberi objekt</option>
+                <option value="1">Sve</option>
+                <option value="2">Bellevue</option>
+                <option value="3">Vespera</option>
+                <option value="4">Aurora</option>
+                <option value="5">Punta</option>
+                <option value="6">Kamp_Cikat</option>
+                <option value="7">Kamp_Baldarin</option>
+                <option value="8">Alhambra</option>
+                <option value="9">Slatina</option>
+                <option value="10">Setnica</option>
+                <option value="11">Uprava</option>
+                <option value="11">Vespera_Restoran</option>
+                <option value="12">Aurora_Restoran</option>
+                <option value="13">Punta_Restoran</option>
+                <option value="14">Bellevue_Restoran</option>
+                <option value="15">Alhambra_Restoran</option>
+            </select>
+        </div>
+      
+    <label for="timepicker" class="glyphicon-time">Vrijeme start : </label>
+    <input class="timepicker">
+    <label for="timepicker1" class="glyphicon-time">Vrijeme stop : </label>
+    <input class="timepicker1">
+    <label for="datum" class="glyphicon-time">Datum : </label>
+    <input type="text" name="datefilter" value="" id="datum" /> 
+    <button onclick="Selector()" class="btn btn-success">Kreni</button>
+</div>
+@*<div class="infoDiv">
+    <select onchange="Selector()" id="myselect">
+        <option value="1">Broj logova</option>
+        <option value="2">Ime</option>
+    </select>
+</div>*@
+    <div id="okvir" style="border:thin">
+
+       
+            <canvas id="myChart5"height="100"></canvas>          
+         
+    </div>
+
+
+
+
+    <script>
+  //  var grafime1 = [];
+  //  var grafpodaci1 = [];
+  //  var ctx = document.getElementById("myChart5").getContext('2d');
+        var d;
+        var d1;
+        var v;
+        var v1;
+        var p;
+        var p1;  
+      
+        $(document).ready(function () {
+           
+            $('input.timepicker').timepicker({
+                timeFormat: 'HH:mm:ss',
+                change: function (string) {
+                    // the input field
+                    var element = $(this), text;
+                    // get access to this Timepicker instance
+                    var timepicker = element.timepicker();
+                    text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                    element.siblings('span.help-line').text(text);
+                    v = timepicker.format(string)
+                    alert(text);
+
+                }
+
+
+            });
+
+
+            $('input.timepicker1').timepicker({
+                timeFormat: 'HH:mm:ss',
+                change: function (string) {
+                    // the input field
+                    var element = $(this), text;
+                    // get access to this Timepicker instance
+                    var timepicker = element.timepicker();
+                    text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                    element.siblings('span.help-line').text(text);
+                    v1 = timepicker.format(string)
+                    alert(text);
+                }
+
+            });
+
+
+            $('input[name="datefilter"]').daterangepicker({
+                autoUpdateInput: true,
+                locale: {
+                    cancelLabel: 'Clear'
+                }
+            });
+
+            $('input[name="datefilter"]').on('apply.daterangepicker', function (ev, picker) {
+                //alert(2)
+                $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+                d = picker.startDate.format('DD/MM/YYYY HH:MM:ss');
+                d1 = picker.endDate.format('DD/MM/YYYY HH:MM:ss');
+                p = picker.startDate.format('DD/MM/YYYY');
+                p1 = picker.endDate.format('DD/MM/YYYY');
+                $(this).val(d + ' - ' + d1);
+                alert(d + ' - ' + d1);
+            });
+
+            $('input[name="datefilter"]').on('cancel.daterangepicker', function (ev, picker) {
+
+                $(this).val('');
+            });
+            Graf();
+         
+        });  
+        function Selector() {
+            if ($("#myselect").val() == 2) {
+                Graf1();
+              
+
+            }
+             if ($("#myselect").val() == 1) {
+
+                 Graf();
+                
+
+
+            }
+            else return;
+        }
+        
+
+
+        function Graf() {      
+           
+         
+            //var grafime2 = null;
+            //var grafpodaci2 = null;
+            var ctx=null;
+            var grafime3 = [];
+            var grafpodaci3 = [];
+            var filtriranipodaci = []; 
+            var filtriranilogovi = [];
+            var filter = $("#filter :selected").text()
+            var filter1 = $("#filter :selected").val()      
+            var ctx = document.getElementById("myChart5").getContext('2d');
+          
+            //var ctx = document.getElementById("myChart5").getContext('2d');
+            $.ajax({
+
+                url: '@Url.Action("Upit", "Home")',
+                type: "POST",
+                data: { "start": v, "end": v1, "date1": p, "date2": p1 },
+                datatype: "json",
+                success: function (data) {
+                    $.each(data.data, function (k, item) {
+                        grafime3.push(item.DeviceName);
+                        grafpodaci3.push(item.NumLogs);
+                    });
+                    $.each(data.data, function (i, v) {
+                        if (filter1 != 1) {
+                            if (v.DeviceName.search(new RegExp(filter)) != -1) {
+                                filtriranipodaci.push(v.DeviceName);
+                                filtriranilogovi.push(v.NumLogs);
+                                ctx.canvas.height = (7022 * (((filtriranipodaci.length) / grafime3.length)))+200;  
+                            }
+
+                        }
+                        else if (filter1 == 1) {
+                            filtriranipodaci = grafime3;
+                            filtriranilogovi = grafpodaci3;
+                            ctx.canvas.height = 4800;
+                            return;
+                        }
+                        //if (ctx.canvas.height < 200) {
+                        //    ctx.canvas.height = 200;
+                        //}
+                    });
+                 
+                
+                  
+                  //alert(ctx.canvas.height);
+                  //  alert($("#myselect").val());
+                  var  myChart = new Chart(ctx, {
+
+                   
+                        type: 'horizontalBar',
+
+                        data: {
+
+                            labels: filtriranipodaci,
+                            datasets: [{
+                                label: 'Jadranka WIFI AP-Broj Logova1',
+                                data: filtriranilogovi,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(200, 100, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(200, 100, 64, 0.2)'
+                                ],
+                                borderWidth: 1
+                             }]
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        options: {
+                           
+                            legend: {
+                                display: true,
+                                labels: {
+                                    fontColor: 'rgb(255, 99, 132)'
+                                },
+
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                       
+                                    }],
+                                    xAxes: [
+                                      
+                                    
+                                        { position: 'top' },
+                                        { position: 'bottom' },
+
+                                    ]
+                                
+                                }
+                            
+                            }
+                        
+                        }
+
+                    });
+                  
+                myChart.destroy();
+                }
+              
+            })
+        }
+
+        function Graf1() {
+        
+            //var grafime3 = null;
+            //var grafpodaci3 = null;
+            var ctx1=null;
+            var grafime2 = [];
+            var grafpodaci2 = [];        
+            var filtriranipodaci1 = [];    
+            var filtriranilogovi1 = [];
+            var filter2 = $("#filter :selected").text()       
+            var filter3 = $("#filter :selected").val()       
+            var ctx1 = document.getElementById("myChart5").getContext('2d');
+                $.ajax({
+
+                    url: '@Url.Action("Upit3", "Home")',
+                type: "POST",
+                data: { "start": v, "end": v1, "date1": p, "date2": p1 },
+                datatype: "json",
+                success: function (data) {
+                    $.each(data.data, function (k, item) {
+                        grafime2.push(item.DeviceName);
+                        grafpodaci2.push(item.NumLogs);
+                    }); 
+                    $.each(data.data, function (i, v) {                     
+                        if (filter3 != 1) {
+                            if (v.DeviceName.search(new RegExp(filter2)) != -1) {
+                                filtriranipodaci1.push(v.DeviceName);
+                                filtriranilogovi1.push(v.NumLogs);
+                                ctx1.canvas.height = (7022 * (((filtriranipodaci1.length) / grafime2.length))+200);
+                             
+                            }
+                           
+                        }
+                        else if (filter3 == 1) {
+                            filtriranipodaci1 = grafime2;
+                            filtriranilogovi1 = grafpodaci2;
+                            ctx1.canvas.height = 4800;
+                            return;
+                        }
+                        //if (ctx1.canvas.height < 200) {
+                        //    ctx1.canvas.height = 200;
+                        //}
+                    });
+                
+                   
+                    
+                   //alert(ctx1.canvas.height);                   
+                   var  myChart1 = new Chart(ctx1, {
+                                                                
+                                    
+                        type: 'horizontalBar',
+                        data: {
+                            labels: filtriranipodaci1,
+                            datasets: [{
+                                label: 'Jadranka WIFI AP-Broj Logova',
+                                data: filtriranilogovi1,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)',
+                                    'rgba(200, 100, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)',
+                                    'rgba(200, 100, 64, 0.2)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        options: {
+                         
+                            legend: {
+                                display: true,
+                                labels: {
+                                    fontColor: 'rgb(255, 99, 132)'
+                                },
+
+                                scales: {
+                                    yAxes: [{
+                                        yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true
+                                            }
+
+                                        }],
+                                    }],
+                                    xAxes: [
+                                       
+                                        
+                                        { position: 'top' },
+                                        { position: 'bottom' },
+                                         
+                                    ]
+                                }
+
+                            }
+                         
+                        }
+                      
+                    });
+                 
+                 myChart1.destroy();
+                }
+
+            })
+                }
+    </script>
+   
+

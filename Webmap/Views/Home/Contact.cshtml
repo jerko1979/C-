@@ -1,0 +1,389 @@
+﻿<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBxChNUHO092Qq-CciDmOSNkg6ivLZQOs&libraries=visualization" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>  
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+
+<style>
+    #map_canvas img {
+        max-width: none;
+
+    }
+</style>
+
+<style>
+    .slidecontainer {
+        width: 100%; /* Width of the outside container */
+    }
+
+    /* The slider itself */
+    .slider {
+        -webkit-appearance: none; /* Override default CSS styles */
+      
+        width: 100%; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 1; /* Fully shown on mouse-over */
+        }
+
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Override default look */
+            
+            width: 25px; /* Set a specific slider handle width */
+            height: 25px; /* Slider handle height */
+            background: #4CAF50; /* Green background */
+            cursor: pointer; /* Cursor on hover */
+        }
+
+      
+</style>
+<style>
+    .example2 {
+    }
+
+        .example2 h3 {
+            margin: 0;
+            text-align: left;
+            font-size: 100%;
+            /* Apply animation to this element */
+            animation: example2 10s ease-out;
+        }
+    /* Move it (define the animation) */
+    @@keyframes example2 {
+        0% {
+            transform: translateX(200%);
+        }
+
+        100% {
+            transform: translateX(0%);
+        }
+    }
+</style>
+
+
+<br />
+<div class="icon-bar">
+    <div class="infoDiv">
+        <div class="example2">
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <h3 id="Status"></h3>
+            </div>
+        </div>
+    </div>
+    <label for="timepicker" >Vrijeme start : </label>
+    <input class="timepicker">
+    <label for="timepicker1">Vrijeme stop : </label>
+    <input class="timepicker1">    
+    <label for="datum">Datum : </label>
+    <input type="text" name="datefilter" value="" id="datum"/>   
+    <button onclick="initMap1()" class="btn btn-success">Kreni</button>
+    <div class="icon-bar">
+        <button onclick="toggleHeatmap()" class="btn btn-primary">Ugasi Heatmap</button>
+        <button onclick="changeGradient()" class="btn btn-primary">Promijeni gradient</button>
+        <button onclick="changeRadius()" class="btn btn-primary">Promijeni radius</button>
+        <button onclick="changeOpacity()" class="btn btn-primary">Promijeni opacity</button>
+        @*<div class="slidecontainer" >
+            <label for="slider" > Promijeni MaxIntensity : </label>
+            <input type= "range" min="0" max="2000" value="10" class="slider" id="myRange" onchange="changeMaxintensity()">
+        </div>*@
+       <form> <div> Promijeni Max Heat</div>
+         <input type="range" name="heatRange" id="heatRangeId" min="0" value="100" step="5" max="1000" onchange="changeMaxintensity1()">
+        </form>
+    </div>    
+    </div>
+<div id="map_canvas" style="height: 650px;border:ridge"></div>
+
+<!-- Enclose the Javascript in a "section" so that it is rendered in the correct order after scripts have been loaded etc -->
+@section scripts {
+         
+    <section class="scripts">
+       
+        <script type="text/javascript">
+
+            var map;
+            var heatmap;
+            var start = "05/09/2017 14:50:50.42";
+            var stop = "06/09/2017 14:50:50.42";
+            var d;
+            var d1;
+            var heatMapData = [];
+            var v;
+            var v1;
+            var p;
+            var p1;
+            var slider = document.getElementById("myRange");
+            var slider1 = document.getElementById("heatRangeId");
+          //output.innerHTML = slider.value; // Display the default slider value
+            $(document).ready(function (time) {
+                setInterval(executeQuery, 5000);
+               
+
+                $('input.timepicker').timepicker({
+                    timeFormat: 'HH:mm:ss',
+                    change: function (string) {
+                        // the input field
+                        var element = $(this), text;
+                        // get access to this Timepicker instance
+                        var timepicker = element.timepicker();
+                        text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                        element.siblings('span.help-line').text(text);
+                        v = timepicker.format(string)
+                        alert(text);
+                    }
+
+
+                });
+
+
+                $('input.timepicker1').timepicker({
+                    timeFormat: 'HH:mm:ss',
+                    change: function (string) {
+                        // the input field
+                        var element = $(this), text;
+                        // get access to this Timepicker instance
+                        var timepicker = element.timepicker();
+                        text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                        element.siblings('span.help-line').text(text);
+                        v1 = timepicker.format(string)
+                        alert(text);
+                    }
+
+                });
+
+                // $('#datetimepicker').datetimepicker();
+                $('input[name="datefilter"]').daterangepicker({
+                    autoUpdateInput: false,
+
+
+                    locale: {
+                        cancelLabel: 'Clear'
+                    }
+                });
+
+                $('input[name="datefilter"]').on('apply.daterangepicker', function (ev, picker) {
+                    //alert(2)
+                    $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+                    d = picker.startDate.format('DD/MM/YYYY HH:MM:ss');
+                    d1 = picker.endDate.format('DD/MM/YYYY HH:MM:ss');
+                    p = picker.startDate.format('DD/MM/YYYY');
+                    p1 = picker.endDate.format('DD/MM/YYYY');
+                    $(this).val(d + ' - ' + d1);
+                    alert(d + ' - ' + d1);
+                });
+
+                $('input[name="datefilter"]').on('cancel.daterangepicker', function (ev, picker) {
+
+                    $(this).val('');
+                });
+
+
+
+                var MaliLosinj = new google.maps.LatLng(44.5355294, 14.4719272);
+                map = new google.maps.Map(document.getElementById('map_canvas'), {
+                    center: MaliLosinj,
+                    zoom: 13,
+                    mapTypeId: 'satellite'
+                });
+                heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: heatmapData
+
+                });
+
+                heatmap.setMap(map);
+                //initMap() ;
+
+
+
+
+            });
+               function executeQuery() {
+                        $.ajax({
+                            url: '@Url.Action("Upit2", "Home")',
+                            type: "post",
+                            data: {},
+                            datatype: "json",
+                            success: function (data) {
+                                $.each(data, function (k, item) {
+
+                                    test = "Ime i vrijeme posljednjeg loga"+ " : " + item.text ;
+                                    document.getElementById("Status").innerHTML = test;
+
+                                    });
+                            }
+
+                        })
+                    }
+            function initMap() {
+                var heatmapData2 = [];
+
+
+                var MaliLosinj = new google.maps.LatLng(44.5355294, 14.4719272);
+
+                map = new google.maps.Map(document.getElementById('map_canvas'), {
+                    center: MaliLosinj,
+                    zoom: 13,
+                    mapTypeId: 'satellite'
+                });
+                $.ajax({
+
+                    url: '@Url.Action("Upit", "Home")',
+                    type: "POST",
+                    data: { "start": d, "end": d1 },
+                    datatype: "json",
+                    success: function (data) {
+                        alert("Podaci učitani!")
+                        $.each(data.data, function (k, item) {
+                            if ((item.GeoLat && item.GeoLong) != null) {
+                             
+                                heatmapData2.push({ location: new google.maps.LatLng(item.GeoLat, item.GeoLong), weight: Math.log2(item.NumLogs) });
+                            }
+                        });
+                        var pointArray = new google.maps.MVCArray(heatmapData2);
+                        heatmap = new google.maps.visualization.HeatmapLayer({
+                            dissipating: true,
+                            data: heatmapData2,
+                           
+
+                        });
+
+                        heatmap.setMap(map);
+
+                    }
+
+                })
+
+
+            }
+
+             function initMap1() {
+            var heatmapData2 = [];
+            var logIndex = [];
+
+                var MaliLosinj = new google.maps.LatLng(44.5355294, 14.4719272);
+
+                map = new google.maps.Map(document.getElementById('map_canvas'), {
+                    center: MaliLosinj,
+                    zoom: 13,
+                    mapTypeId: 'satellite'
+                });
+                $.ajax({
+
+                    url: '@Url.Action("Upit1", "Home")',
+                    type: "POST",
+                    data: { "start": v, "end": v1, "date1": p,"date2":p1 },
+                    datatype: "json",
+                    success: function (data) {
+                        alert("Podaci učitani!")
+                        $.each(data.data, function (k, item) {
+                    
+                            if (((item.GeoLat && item.GeoLong) != null)&&item.NumLogs!=0) {
+                               
+                                heatmapData2.push({ location: new google.maps.LatLng(item.GeoLat, item.GeoLong), weight: Math.log(item.NumLogs) });
+                              
+                            }
+                        });
+                        var pointArray = new google.maps.MVCArray(heatmapData2);
+                        heatmap = new google.maps.visualization.HeatmapLayer({
+                            dissipating: true,
+                            maxIntensity:10,
+                            data: heatmapData2,
+                          
+                            
+                          
+
+                        });
+
+                        heatmap.setMap(map);
+
+                    }
+
+                })
+
+
+            }
+
+            function toggleHeatmap() {
+            heatmap.setMap(heatmap.getMap() ? null : map);
+              
+               
+            }
+
+
+
+            function changeGradient() {
+                var gradient = [
+                    'rgba(0, 255, 255, 0)',
+                    'rgba(0, 255, 255, 1)',
+                    'rgba(0, 191, 255, 1)',
+                    'rgba(0, 127, 255, 1)',
+                    'rgba(0, 63, 255, 1)',
+                    'rgba(0, 0, 255, 1)',
+                    'rgba(0, 0, 223, 1)',
+                    'rgba(0, 0, 191, 1)',
+                    'rgba(0, 0, 159, 1)',
+                    'rgba(0, 0, 127, 1)',
+                    'rgba(63, 0, 91, 1)',
+                    'rgba(127, 0, 63, 1)',
+                    'rgba(191, 0, 31, 1)',
+                    'rgba(255, 0, 0, 1)'
+
+                ]
+                heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+            }
+
+            function changeRadius() {
+                heatmap.set('radius', heatmap.get('radius') ? null : 20);
+            }
+
+            function changeOpacity() {
+                heatmap.set('opacity', heatmap.get('opacity') ? null : 0.99);              
+               
+            }
+
+           
+            //function changeMaxintensity() {               
+            //    heatmap.setOptions({
+            //        maxIntensity: slider.value,
+
+            //    });
+            //}
+          
+            function changeMaxintensity1() {
+                heatmap.setOptions({
+                    maxIntensity: slider1.value,
+
+                });
+            }
+           
+            
+
+
+
+        </script>
+        
+    </section>
+
+}
+

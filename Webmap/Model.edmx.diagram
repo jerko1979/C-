@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="cfb66291ff6c4896b55e6d748d200420" Name="Diagram1">
+        <EntityTypeShape EntityType="RuckusLogModel.Device" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RuckusLogModel.EventType" Width="1.5" PointX="0.5" PointY="6" />
+        <EntityTypeShape EntityType="RuckusLogModel.Ruckus_Log" Width="1.5" PointX="3" PointY="0.75" />
+        <EntityTypeShape EntityType="RuckusLogModel.Ssid" Width="1.5" PointX="3.25" PointY="5.25" />
+        <EntityTypeShape EntityType="RuckusLogModel.User" Width="1.5" PointX="0.625" PointY="3.5" />
+        <AssociationConnector Association="RuckusLogModel.FK_Ruckus_Log_Device" />
+        <AssociationConnector Association="RuckusLogModel.FK_Ruckus_Log_EventType" />
+        <AssociationConnector Association="RuckusLogModel.FK_Ruckus_Log_Ssid" />
+        <AssociationConnector Association="RuckusLogModel.FK_Ruckus_Log_User" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

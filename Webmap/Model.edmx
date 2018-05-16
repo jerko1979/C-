@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RuckusLogModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="DeviceId" />
+          </Key>
+          <Property Name="DeviceId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DeviceMac" Type="nvarchar" MaxLength="18" />
+          <Property Name="DeviceName" Type="nvarchar" MaxLength="50" />
+          <Property Name="GeoLong" Type="float" />
+          <Property Name="GeoLat" Type="float" />
+        </EntityType>
+        <EntityType Name="EventType">
+          <Key>
+            <PropertyRef Name="EventId" />
+          </Key>
+          <Property Name="EventId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EventName" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Ruckus_Log">
+          <Key>
+            <PropertyRef Name="LogId" />
+          </Key>
+          <Property Name="LogId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TimeStamp" Type="datetime" />
+          <Property Name="EventTypeId" Type="int" />
+          <Property Name="Snr" Type="int" />
+          <Property Name="Rssi" Type="int" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="DeviceId" Type="int" />
+          <Property Name="SsidId" Type="int" />
+        </EntityType>
+        <EntityType Name="Ssid">
+          <Key>
+            <PropertyRef Name="SsidId" />
+          </Key>
+          <Property Name="SsidId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SsidName" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserMac" Type="nchar" MaxLength="18" />
+        </EntityType>
+        <Association Name="FK_Ruckus_Log_Device">
+          <End Role="Device" Type="Self.Device" Multiplicity="0..1" />
+          <End Role="Ruckus_Log" Type="Self.Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Device">
+              <PropertyRef Name="DeviceId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="DeviceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_EventType">
+          <End Role="EventType" Type="Self.EventType" Multiplicity="0..1" />
+          <End Role="Ruckus_Log" Type="Self.Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EventType">
+              <PropertyRef Name="EventId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="EventTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_Ssid">
+          <End Role="Ssid" Type="Self.Ssid" Multiplicity="0..1" />
+          <End Role="Ruckus_Log" Type="Self.Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ssid">
+              <PropertyRef Name="SsidId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="SsidId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_User">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Ruckus_Log" Type="Self.Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RuckusLogModelStoreContainer">
+          <EntitySet Name="Device" EntityType="Self.Device" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EventType" EntityType="Self.EventType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ruckus_Log" EntityType="Self.Ruckus_Log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ssid" EntityType="Self.Ssid" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Ruckus_Log_Device" Association="Self.FK_Ruckus_Log_Device">
+            <End Role="Device" EntitySet="Device" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_EventType" Association="Self.FK_Ruckus_Log_EventType">
+            <End Role="EventType" EntitySet="EventType" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_Ssid" Association="Self.FK_Ruckus_Log_Ssid">
+            <End Role="Ssid" EntitySet="Ssid" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_User" Association="Self.FK_Ruckus_Log_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RuckusLogModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="DeviceId" />
+          </Key>
+          <Property Name="DeviceId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DeviceMac" Type="String" MaxLength="18" FixedLength="false" Unicode="true" />
+          <Property Name="DeviceName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GeoLong" Type="Double" />
+          <Property Name="GeoLat" Type="Double" />
+          <NavigationProperty Name="Ruckus_Log" Relationship="RuckusLogModel.FK_Ruckus_Log_Device" FromRole="Device" ToRole="Ruckus_Log" />
+        </EntityType>
+        <EntityContainer Name="RuckusLogEntities6" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Device" EntityType="Self.Device" />
+          <EntitySet Name="EventType" EntityType="RuckusLogModel.EventType" />
+          <EntitySet Name="Ruckus_Log" EntityType="RuckusLogModel.Ruckus_Log" />
+          <EntitySet Name="Ssid" EntityType="RuckusLogModel.Ssid" />
+          <EntitySet Name="User" EntityType="RuckusLogModel.User" />
+          <AssociationSet Name="FK_Ruckus_Log_Device" Association="RuckusLogModel.FK_Ruckus_Log_Device">
+            <End Role="Device" EntitySet="Device" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_EventType" Association="RuckusLogModel.FK_Ruckus_Log_EventType">
+            <End Role="EventType" EntitySet="EventType" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_Ssid" Association="RuckusLogModel.FK_Ruckus_Log_Ssid">
+            <End Role="Ssid" EntitySet="Ssid" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ruckus_Log_User" Association="RuckusLogModel.FK_Ruckus_Log_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Ruckus_Log" EntitySet="Ruckus_Log" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="EventType">
+          <Key>
+            <PropertyRef Name="EventId" />
+          </Key>
+          <Property Name="EventId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EventName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Ruckus_Log" Relationship="RuckusLogModel.FK_Ruckus_Log_EventType" FromRole="EventType" ToRole="Ruckus_Log" />
+        </EntityType>
+        <EntityType Name="Ruckus_Log">
+          <Key>
+            <PropertyRef Name="LogId" />
+          </Key>
+          <Property Name="LogId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TimeStamp" Type="DateTime" Precision="3" />
+          <Property Name="EventTypeId" Type="Int32" />
+          <Property Name="Snr" Type="Int32" />
+          <Property Name="Rssi" Type="Int32" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="DeviceId" Type="Int32" />
+          <Property Name="SsidId" Type="Int32" />
+          <NavigationProperty Name="Device" Relationship="RuckusLogModel.FK_Ruckus_Log_Device" FromRole="Ruckus_Log" ToRole="Device" />
+          <NavigationProperty Name="EventType" Relationship="RuckusLogModel.FK_Ruckus_Log_EventType" FromRole="Ruckus_Log" ToRole="EventType" />
+          <NavigationProperty Name="Ssid" Relationship="RuckusLogModel.FK_Ruckus_Log_Ssid" FromRole="Ruckus_Log" ToRole="Ssid" />
+          <NavigationProperty Name="User" Relationship="RuckusLogModel.FK_Ruckus_Log_User" FromRole="Ruckus_Log" ToRole="User" />
+        </EntityType>
+        <EntityType Name="Ssid">
+          <Key>
+            <PropertyRef Name="SsidId" />
+          </Key>
+          <Property Name="SsidId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SsidName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Ruckus_Log" Relationship="RuckusLogModel.FK_Ruckus_Log_Ssid" FromRole="Ssid" ToRole="Ruckus_Log" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserMac" Type="String" MaxLength="18" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="Ruckus_Log" Relationship="RuckusLogModel.FK_Ruckus_Log_User" FromRole="User" ToRole="Ruckus_Log" />
+        </EntityType>
+        <Association Name="FK_Ruckus_Log_Device">
+          <End Type="RuckusLogModel.Device" Role="Device" Multiplicity="0..1" />
+          <End Type="RuckusLogModel.Ruckus_Log" Role="Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Device">
+              <PropertyRef Name="DeviceId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="DeviceId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_EventType">
+          <End Type="RuckusLogModel.EventType" Role="EventType" Multiplicity="0..1" />
+          <End Type="RuckusLogModel.Ruckus_Log" Role="Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EventType">
+              <PropertyRef Name="EventId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="EventTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_Ssid">
+          <End Type="RuckusLogModel.Ssid" Role="Ssid" Multiplicity="0..1" />
+          <End Type="RuckusLogModel.Ruckus_Log" Role="Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ssid">
+              <PropertyRef Name="SsidId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="SsidId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ruckus_Log_User">
+          <End Type="RuckusLogModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="RuckusLogModel.Ruckus_Log" Role="Ruckus_Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Ruckus_Log">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RuckusLogModelStoreContainer" CdmEntityContainer="RuckusLogEntities6">
+          <EntitySetMapping Name="Device">
+            <EntityTypeMapping TypeName="RuckusLogModel.Device">
+              <MappingFragment StoreEntitySet="Device">
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="DeviceMac" ColumnName="DeviceMac" />
+                <ScalarProperty Name="DeviceName" ColumnName="DeviceName" />
+                <ScalarProperty Name="GeoLong" ColumnName="GeoLong" />
+                <ScalarProperty Name="GeoLat" ColumnName="GeoLat" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EventType">
+            <EntityTypeMapping TypeName="RuckusLogModel.EventType">
+              <MappingFragment StoreEntitySet="EventType">
+                <ScalarProperty Name="EventName" ColumnName="EventName" />
+                <ScalarProperty Name="EventId" ColumnName="EventId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ruckus_Log">
+            <EntityTypeMapping TypeName="RuckusLogModel.Ruckus_Log">
+              <MappingFragment StoreEntitySet="Ruckus_Log">
+                <ScalarProperty Name="SsidId" ColumnName="SsidId" />
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Rssi" ColumnName="Rssi" />
+                <ScalarProperty Name="Snr" ColumnName="Snr" />
+                <ScalarProperty Name="EventTypeId" ColumnName="EventTypeId" />
+                <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+                <ScalarProperty Name="LogId" ColumnName="LogId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ssid">
+            <EntityTypeMapping TypeName="RuckusLogModel.Ssid">
+              <MappingFragment StoreEntitySet="Ssid">
+                <ScalarProperty Name="SsidName" ColumnName="SsidName" />
+                <ScalarProperty Name="SsidId" ColumnName="SsidId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User">
+            <EntityTypeMapping TypeName="RuckusLogModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="UserMac" ColumnName="UserMac" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

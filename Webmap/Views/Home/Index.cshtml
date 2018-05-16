@@ -1,0 +1,348 @@
+﻿<script src="http://maps.google.com/maps/api/js?key=AIzaSyC4O9OqVeQ9jCpi_yctcFQ_Ae_I6RPorbU&callback=initMap" type="text/javascript"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap/3/css/bootstrap.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script src="~/Scripts/notify.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/notify/0.4.2/notify.js"></script>
+
+<style>
+    #map_canvas img {
+        max-width: none;
+    }
+</style>
+<style>
+    .example2 {
+       
+    }
+        .example2 h3 {
+            margin: 0;
+            text-align: left;
+            font-size: 100%;
+            /* Apply animation to this element */
+            animation: example2 10s ease-out;
+        }
+/* Move it (define the animation) */
+@@keyframes example2 {
+ 0%   {
+ transform: translateX(200%);
+ }
+ 100% {
+ transform: translateX(0%);
+ }
+}
+</style>
+
+<!-- This css is to give a nice big popup "info window" when a marker is clicked on the map -->
+<style>
+    .infoDiv {
+        background-color: whitesmoke;
+        text-align: left;
+        -webkit-user-select: none;
+        font-family: "Times New Roman";
+        font-weight: bolder;
+    }
+</style>
+<br />
+<!-- This is the div that will contain the Google Map -->
+<div class="icon-bar">
+    <div class="infoDiv">
+        <div class="example2">
+            <div class="alert alert-success alert-dismissible">
+                <a href="#" class="close"data-dismiss="alert" aria-label="close">&times;</a>
+                <h3 id="Status"></h3>
+            </div>            
+        </div>
+    </div>
+
+    <label for="timepicker" >Vrijeme start : </label>
+    <input class="timepicker">
+    <label for="timepicker1" >Vrijeme stop : </label>
+    <input class="timepicker1">  
+    <label for="datum" >Datum : </label>
+    <input type="text" name="datefilter" value="" id="datum" />
+    <button onclick="Initialize1()" class="btn btn-success">Kreni</button>
+    </div>
+<div class="navbar-left" style="width: 20%">
+    @Html.Partial("~/Views/Shared/Error.cshtml")
+</div>
+<div id="map_canvas" style="height: 650px;">
+  
+    
+</div>
+    <!-- Enclose the Javascript in a "section" so that it is rendered in the correct order after scripts have been loaded etc -->
+    @section scripts {
+        <section class="scripts">
+
+            <script type="text/javascript">
+            var start = "05/09/2017 14:50:50.42";
+            var stop = "06/09/2017 14:50:50.42";
+            var d;
+            var d1;
+            var v;
+            var v1;
+            var p;
+                var p1;
+                var test;
+
+
+                $(document).ready(function () {
+                    setInterval(executeQuery, 10000);
+                  
+                    $('input.timepicker').timepicker({
+                        timeFormat: 'HH:mm:ss',
+                        change: function (string) {
+                            // the input field
+                            var element = $(this), text;
+                            // get access to this Timepicker instance
+                            var timepicker = element.timepicker();
+                            text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                            element.siblings('span.help-line').text(text);
+                            v = timepicker.format(string)
+                            alert(text);
+                           
+                        }
+
+
+                    });
+
+
+                    $('input.timepicker1').timepicker({
+                        timeFormat: 'HH:mm:ss',
+                        change: function (string) {
+                            // the input field
+                            var element = $(this), text;
+                            // get access to this Timepicker instance
+                            var timepicker = element.timepicker();
+                            text = 'Odabrano vrijeme je: ' + timepicker.format(string) + 'h';
+                            element.siblings('span.help-line').text(text);
+                            v1 = timepicker.format(string)
+                            alert(text);
+                        }
+
+                    });
+
+
+                $('input[name="datefilter"]').daterangepicker({
+                    autoUpdateInput: false,
+                    locale: {
+                        cancelLabel: 'Clear'
+                    }
+                });
+
+                $('input[name="datefilter"]').on('apply.daterangepicker', function (ev, picker) {
+                    //alert(2)
+                    $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+
+                    d = picker.startDate.format('DD/MM/YYYY HH:MM:ss');
+                    d1 = picker.endDate.format('DD/MM/YYYY HH:MM:ss');
+                    p = picker.startDate.format('DD/MM/YYYY');
+                    p1 = picker.endDate.format('DD/MM/YYYY');
+                    $(this).val(d + ' - ' + d1);
+                    alert(d + ' - ' + d1);
+                });
+
+                $('input[name="datefilter"]').on('cancel.daterangepicker', function (ev, picker) {
+
+                    $(this).val('');
+                });
+                // drugi kalendar
+
+                //Initialize();
+                // Google has tweaked their interface somewhat - this tells the api to use that new UI
+                google.maps.visualRefresh = true;
+                var Tunisie = new google.maps.LatLng(44.5355294, 14.4719272);
+
+                // These are options that set initial zoom level, where the map is centered globally to start, and the type of map to show
+                var mapOptions = {
+                    zoom: 12,
+                    center: Tunisie,
+                    mapTypeId: google.maps.MapTypeId.G_NORMAL_MAP
+                };
+
+                // This makes the div with id "map_canvas" a google map
+                var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+
+
+
+            });
+
+            // Where all the fun happens
+                function executeQuery() {
+                   
+                        $.ajax({
+                            url: '@Url.Action("Upit2", "Home")',
+                            type: "post",
+                            data: {},
+                            datatype: "json",
+                            success: function (data) {
+                                $.each(data, function (k, item) {
+
+                                    test = "Ime i vrijeme posljednjeg loga"+ " : " + item.text ;
+                                    document.getElementById("Status").innerHTML = test;
+
+                                    });
+                            }
+                            
+                    })
+                        $(".icon-bar").notify(test, "info" ,{ position: "bottom" });
+                }
+            function Initialize() {
+
+                // Google has tweaked their interface somewhat - this tells the api to use that new UI
+                google.maps.visualRefresh = true;
+                var Tunisie = new google.maps.LatLng(44.5355294, 14.4719272);
+
+                // These are options that set initial zoom level, where the map is centered globally to start, and the type of map to show
+                var mapOptions = {
+                    zoom: 12,
+                    center: Tunisie,
+                    mapTypeId: google.maps.MapTypeId.G_NORMAL_MAP
+                };
+
+
+                // This makes the div with id "map_canvas" a google map
+                var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+                //a sample list of JSON encoded data of places to visit in Tunisia
+                //you can either make up a JSON list server side, or call it from a controller using JSONResult
+                var data = [
+                    { "Id": 1, "PlaceName": "Zaghouan", "GeoLong": "36.401081", "GeoLat": "10.16596" },
+                    { "Id": 2, "PlaceName": "Hammamet ", "GeoLong": "36.4", "GeoLat": "10.616667" },
+                    { "Id": 3, "PlaceName": "Sousse", "GeoLong": "35.8329809", "GeoLat": "10.63875" },
+                    { "Id": 4, "PlaceName": "Sfax", "GeoLong": "34.745159", "GeoLat": "10.7613" }
+                ];
+
+                // Using the JQuery "each" selector to iterate through the JSON list and drop marker pins
+                $.ajax({
+                     url: '@Url.Action("Upit", "Home")',
+                    type: "POST",
+                    data: { "start": d, "end": d1 },
+                    datatype: "json",
+                    success: function (data) {
+                        $.each(data.data, function (k, item){
+
+                            var marker = new google.maps.Marker({
+                                'position': new google.maps.LatLng(item.GeoLat, item.GeoLong),
+                                'map': map,
+                                'animation': google.maps.Animation.BOUNCE,
+                                'title': item.DeviceName,
+
+                            });
+
+                            // Make the marker-pin blue!
+                            marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+                            var contentString = '<div class="infoDiv">'+"Ime: "+ item.DeviceName +
+                                                '<div id="NumLog">' + "Broj logova : "+ item.NumLogs +
+                                                '<div id="Geolat">' + "Geolat  :" + item.GeoLat +
+                                                '<div id="GeoLong">'+ "Geolong :" + item.GeoLong +
+                                                '</div>';
+
+
+
+                            // put in some information about each json object - in this case, the opening hours.
+                            var infowindow = new google.maps.InfoWindow({
+                                content: contentString
+
+                            });
+
+                            // finally hook up an "OnClick" listener to the map so it pops up out info-window when the marker-pin is clicked!
+                            google.maps.event.addListener(marker, 'click', function () {
+                                infowindow.open(map, marker);
+
+
+                            });
+
+                        })
+                    }
+                })
+
+
+            }
+  function Initialize1() {
+
+                // Google has tweaked their interface somewhat - this tells the api to use that new UI
+                google.maps.visualRefresh = true;
+                var Tunisie = new google.maps.LatLng(44.5355294, 14.4719272);
+
+                // These are options that set initial zoom level, where the map is centered globally to start, and the type of map to show
+                var mapOptions = {
+                    zoom: 12,
+                    center: Tunisie,
+                    mapTypeId: google.maps.MapTypeId.G_NORMAL_MAP
+                };
+
+
+                // This makes the div with id "map_canvas" a google map
+                var map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+
+
+                //a sample list of JSON encoded data of places to visit in Tunisia
+                //you can either make up a JSON list server side, or call it from a controller using JSONResult
+                var data = [
+                    { "Id": 1, "PlaceName": "Zaghouan", "GeoLong": "36.401081", "GeoLat": "10.16596" },
+                    { "Id": 2, "PlaceName": "Hammamet ", "GeoLong": "36.4", "GeoLat": "10.616667" },
+                    { "Id": 3, "PlaceName": "Sousse", "GeoLong": "35.8329809", "GeoLat": "10.63875" },
+                    { "Id": 4, "PlaceName": "Sfax", "GeoLong": "34.745159", "GeoLat": "10.7613" }
+                ];
+
+                // Using the JQuery "each" selector to iterate through the JSON list and drop marker pins
+                $.ajax({
+                     url: '@Url.Action("Upit1", "Home")',
+                    type: "POST",
+                    data: { "start": v, "end": v1, "date1": p, "date2": p1},
+                    datatype: "json",
+                    success: function (data) {
+                        $.each(data.data, function (k, item){
+
+                            var marker = new google.maps.Marker({
+                                'position': new google.maps.LatLng(item.GeoLat, item.GeoLong),
+                                'map': map,
+                                'title': item.DeviceName,
+
+                            });
+
+                            // Make the marker-pin blue!
+                            marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+                            var contentString = '<div class="infoDiv">'+"Ime: "+ item.DeviceName +
+                                                '<div id="NumLog">' + "Broj logova : "+ item.NumLogs +
+                                                '<div id="Geolat">' + "Geolat  :" + item.GeoLat +
+                                                '<div id="GeoLong">'+ "Geolong :" + item.GeoLong +
+                                                '</div>';
+
+
+
+                            // put in some information about each json object - in this case, the opening hours.
+                            var infowindow = new google.maps.InfoWindow({
+                                content: contentString
+
+                            });
+
+                            // finally hook up an "OnClick" listener to the map so it pops up out info-window when the marker-pin is clicked!
+                            google.maps.event.addListener(marker, 'click', function () {
+                                infowindow.open(map, marker);
+
+
+                            });
+
+                        })
+                    }
+                })
+
+
+            }
+
+            </script>
+        </section>
+    }
